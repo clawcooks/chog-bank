@@ -3,9 +3,9 @@
 ## 01 — Your project
 
 - **Project name:** Chog Bank
-- **Team members:** _[fill in — name(s) + Discord handle(s) + X handle(s)]_
-- **Discord:** _[team/project Discord handle]_
-- **X:** _[team/project X handle]_
+- **Team:** monasex
+- **Discord:** monasex_
+- **X:** [@monasex_1](https://x.com/monasex_1)
 
 ## 02 — What you built
 
