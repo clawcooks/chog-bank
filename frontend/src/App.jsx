@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ethers } from "ethers";
 import contracts from "./contracts.json";
 import { ensureChain, CHAINS } from "./chain.js";
+import chogImage from "./assets/chog.jpg";
+import chogBankHeroImage from "./assets/chog-bank-hero.jpg";
 
 const TERM_LABELS = { 7: "7 days", 14: "14 days", 30: "30 days" };
 
@@ -410,6 +412,7 @@ export default function App() {
 
       {!connected && (
         <section className="hero">
+          <img src={chogBankHeroImage} alt="Chog Bank" className="hero-image" />
           <h1>Borrow against your Chog. Never sell it.</h1>
           <p>
             Lock a Chog NFT as collateral and borrow up to 67% of its value in MON.
@@ -761,6 +764,7 @@ function GuideContent() {
 function IntroScreen({ onLaunch }) {
   return (
     <div className="app intro-screen">
+      <img src={chogImage} alt="Chog" className="intro-chog-image" />
       <div className="brand intro-brand">
         <span className="brand-badge">CHOG</span>
         <span className="brand-name">CHOG BANK</span>
@@ -778,7 +782,7 @@ function IntroScreen({ onLaunch }) {
 function WelcomeScreen({ onSkip }) {
   return (
     <div className="app welcome-screen" onClick={onSkip}>
-      <div className="welcome-badge">CHOG</div>
+      <img src={chogImage} alt="Chog" className="welcome-chog-image" />
       <h1>Welcome to Chog Bank</h1>
       <p className="muted">Let's get started...</p>
     </div>
