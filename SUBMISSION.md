@@ -90,22 +90,6 @@ of a Chog NFT sitting in the vault as collateral:
      price-per-share figure move as loans/gambles happen.
   9. Click **Guide** in the header any time to re-read the walkthrough.
 
-### Suggested 3-minute demo video script
-
-1. **(0:00–0:20)** Open the intro screen, read the pitch out loud in your
-   own words, click Launch App.
-2. **(0:20–0:50)** Connect wallet, mint a test Chog NFT, show it's
-   auto-priced and ready to borrow against.
-3. **(0:50–1:30)** Borrow against it — point out the live interest/payoff
-   preview as you change the loan term.
-4. **(1:30–2:10)** Gamble instead of repaying — show the coin-flip modal,
-   explain both outcomes (win: NFT back, debt gone; lose: still owed, but
-   CHOG bonus).
-5. **(2:10–2:40)** Redeem the CHOG bonus for MON; show the Liquidity Pool
-   panel and explain anyone can become the house.
-6. **(2:40–3:00)** Close on the Guide button and point at the testnet
-   contract addresses below as proof it's really on-chain.
-
 ## 05 — Under the hood
 
 - **Repository:** https://github.com/clawcooks/chog-bank
