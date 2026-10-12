@@ -71,7 +71,7 @@ of a Chog NFT sitting in the vault as collateral:
 
 - **Live demo:** https://claude.ai/artifact/DmvZKouDjfrHqWfE84xBiv
   (public — "Anyone with the link" access confirmed)
-- **Demo video:** _[record a walkthrough up to 3 minutes — suggested script below]_
+- **Demo video:** https://x.com/monasex_1/status/2109284801307893883?s=20
 - **Testing instructions:**
   1. Open the live demo link and click **Launch App**.
   2. Click **Connect Wallet** (MetaMask or any injected wallet). If
