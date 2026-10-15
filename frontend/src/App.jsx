@@ -27,6 +27,31 @@ function formatError(err) {
   return (match ? match[1] : raw).trim();
 }
 
+function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    try {
+      const stored = localStorage.getItem("chogbank_theme");
+      if (stored === "light" || stored === "dark") return stored;
+    } catch {
+      /* ignore */
+    }
+    return typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem("chogbank_theme", theme);
+    } catch {
+      /* per-viewer convenience only */
+    }
+  }, [theme]);
+
+  return [theme, setTheme];
+}
+
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(
     () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
@@ -98,6 +123,7 @@ function markIntroSeen() {
 export default function App() {
   const [stage, setStage] = useState(() => (hasSeenIntro() ? "app" : "intro")); // 'intro' | 'welcome' | 'app'
   const [showGuide, setShowGuide] = useState(false);
+  const [theme, setTheme] = useTheme();
 
   const [account, setAccount] = useState(null);
   const [chainId, setChainId] = useState(null);
@@ -412,7 +438,7 @@ export default function App() {
   };
 
   if (stage === "intro") {
-    return <IntroScreen onLaunch={launchApp} />;
+    return <IntroScreen onLaunch={launchApp} theme={theme} onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")} />;
   }
 
   if (stage === "welcome") {
@@ -427,6 +453,14 @@ export default function App() {
           <span className="brand-name">CHOG BANK</span>
         </div>
         <div className="topbar-right">
+          <button
+            className="btn small ghost theme-toggle"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? "☀" : "☾"}
+          </button>
           <button className="btn small ghost" onClick={() => setShowGuide(true)}>
             Guide
           </button>
@@ -819,9 +853,17 @@ function GuideContent() {
   );
 }
 
-function IntroScreen({ onLaunch }) {
+function IntroScreen({ onLaunch, theme, onToggleTheme }) {
   return (
     <div className="app intro-screen">
+      <button
+        className="btn small ghost theme-toggle intro-theme-toggle"
+        onClick={onToggleTheme}
+        aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      >
+        {theme === "dark" ? "☀" : "☾"}
+      </button>
       <img src={chogImage} alt="Chog" className="intro-chog-image" />
       <div className="brand intro-brand">
         <span className="brand-badge">CHOG</span>
