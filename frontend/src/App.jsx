@@ -464,7 +464,12 @@ export default function App() {
 
       {!connected && (
         <section className="hero">
-          <img src={chogBankHeroImage} alt="Chog Bank" className="hero-image" />
+          <div className="hero-image-wrap">
+            <span className="live-badge">
+              <span className="live-dot" /> LIVE ON TESTNET
+            </span>
+            <img src={chogBankHeroImage} alt="Chog Bank" className="hero-image" />
+          </div>
           <h1>Borrow against your Chog. Never sell it.</h1>
           <p>
             Lock a Chog NFT as collateral and borrow up to 67% of its value in MON.
