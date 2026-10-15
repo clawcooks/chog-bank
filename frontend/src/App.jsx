@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ethers } from "ethers";
 import contracts from "./contracts.json";
 import { ensureChain, CHAINS } from "./chain.js";
@@ -25,6 +25,58 @@ function formatError(err) {
   // down to just the contract's revert reason.
   const match = raw.match(/execution reverted:?\s*"?([^"]+?)"?\s*$/i);
   return (match ? match[1] : raw).trim();
+}
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(
+    () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!mq) return;
+    const handler = () => setReduced(mq.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return reduced;
+}
+
+/** Ticks its displayed value from the old amount to a new one instead of
+ * snapping, whenever `value` (wei, as a BigInt) changes. */
+function AnimatedNumber({ value, digits = 2 }) {
+  const reduced = usePrefersReducedMotion();
+  const target = Number(ethers.formatEther(value ?? 0n));
+  const [display, setDisplay] = useState(target);
+  const fromRef = useRef(target);
+  const rafRef = useRef(null);
+
+  useEffect(() => {
+    if (reduced) {
+      setDisplay(target);
+      fromRef.current = target;
+      return;
+    }
+    const from = fromRef.current;
+    if (from === target) return;
+    const duration = 650;
+    const startTime = performance.now();
+    cancelAnimationFrame(rafRef.current);
+    const tick = (now) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(from + (target - from) * eased);
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        fromRef.current = target;
+      }
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target, reduced]);
+
+  return display.toFixed(digits);
 }
 
 function hasSeenIntro() {
@@ -439,15 +491,15 @@ export default function App() {
           <section className="card stats">
             <div className="stat">
               <span className="stat-label">Pool TVL</span>
-              <span className="stat-value">{pool ? fmt(pool.poolValue, 2) : "0.00"} MON</span>
+              <span className="stat-value"><AnimatedNumber value={pool?.poolValue} digits={2} /> MON</span>
             </div>
             <div className="stat">
               <span className="stat-label">Your Balance</span>
-              <span className="stat-value">{fmt(monBalance, 3)} MON</span>
+              <span className="stat-value"><AnimatedNumber value={monBalance} digits={3} /> MON</span>
             </div>
             <div className="stat">
               <span className="stat-label">Your CHOG</span>
-              <span className="stat-value">{fmt(chogBalance, 2)} CHOG</span>
+              <span className="stat-value"><AnimatedNumber value={chogBalance} digits={2} /> CHOG</span>
             </div>
           </section>
 
@@ -553,11 +605,11 @@ function NftCard({ nft, allowedTerms, termRates, onBorrow, busy }) {
               </div>
               <div className="row small-print">
                 <span>Interest ({rateBps / 100}%)</span>
-                <span>{fmt(interest, 3)} MON</span>
+                <span><AnimatedNumber value={interest} digits={3} /> MON</span>
               </div>
               <div className="row small-print strong">
                 <span>To redeem</span>
-                <span>{fmt(totalDue, 3)} MON</span>
+                <span><AnimatedNumber value={totalDue} digits={3} /> MON</span>
               </div>
             </>
           )}
@@ -626,15 +678,15 @@ function LiquidityPanel({ pool, onDeposit, onWithdraw, busy }) {
         <>
           <div className="row">
             <span>Price per share</span>
-            <span>{fmt(pool.pricePerShare, 4)} MON</span>
+            <span><AnimatedNumber value={pool.pricePerShare} digits={4} /> MON</span>
           </div>
           <div className="row">
             <span>Your shares</span>
-            <span>{fmt(pool.myShares, 4)}</span>
+            <span><AnimatedNumber value={pool.myShares} digits={4} /></span>
           </div>
           <div className="row strong">
             <span>Your pool value</span>
-            <span>{fmt(pool.myValue, 4)} MON</span>
+            <span><AnimatedNumber value={pool.myValue} digits={4} /> MON</span>
           </div>
         </>
       )}
@@ -674,18 +726,19 @@ function ChogRedemptionPanel({ chogEcon, chogBalance, onRedeem, busy }) {
           </div>
           <div className="row">
             <span>Reserve available</span>
-            <span>{fmt(chogEcon.reserve, 4)} MON</span>
+            <span><AnimatedNumber value={chogEcon.reserve} digits={4} /> MON</span>
           </div>
           <div className="row">
             <span>Your CHOG</span>
-            <span>{fmt(chogBalance, 2)}</span>
+            <span><AnimatedNumber value={chogBalance} digits={2} /></span>
           </div>
           <div className="row strong">
             <span>Max redeemable now</span>
             <span>
-              {chogEcon.rateWei > 0n
-                ? fmt((chogEcon.reserve * ethers.parseEther("1")) / chogEcon.rateWei, 2)
-                : "0.00"}{" "}
+              <AnimatedNumber
+                value={chogEcon.rateWei > 0n ? (chogEcon.reserve * ethers.parseEther("1")) / chogEcon.rateWei : 0n}
+                digits={2}
+              />{" "}
               CHOG
             </span>
           </div>

@@ -96,6 +96,9 @@ body::after {
 }
 @media (prefers-reduced-motion: reduce) {
   body::before, body::after { animation: none; }
+  .card, .nft-card, .loan-card, .welcome-chog-image, .coin.flipping {
+    animation: none;
+  }
 }
 
 h1, h2, h3 {
@@ -385,8 +388,20 @@ h1, h2, h3 {
   padding: 20px;
   box-shadow: var(--shadow-rest);
   transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  animation: card-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
 .card:hover { border-color: var(--glass-border-hover); }
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.grid > .card:nth-child(1) { animation-delay: 0s; }
+.grid > .card:nth-child(2) { animation-delay: 0.06s; }
+.grid > .card:nth-child(3) { animation-delay: 0.12s; }
+.grid > .card:nth-child(4) { animation-delay: 0.18s; }
+.grid > .card:nth-child(5) { animation-delay: 0.24s; }
+.grid > .card:nth-child(6) { animation-delay: 0.3s; }
 
 .card h2 {
   margin: 0 0 14px;
@@ -432,6 +447,7 @@ h1, h2, h3 {
   border-radius: 14px;
   padding: 14px;
   box-shadow: var(--shadow-rest);
+  animation: card-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
   transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .nft-card:hover, .loan-card:hover {
