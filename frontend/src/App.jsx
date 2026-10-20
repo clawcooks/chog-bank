@@ -122,6 +122,7 @@ function markIntroSeen() {
 
 export default function App() {
   const [stage, setStage] = useState(() => (hasSeenIntro() ? "app" : "intro")); // 'intro' | 'welcome' | 'app'
+  const [view, setView] = useState("home"); // 'home' | 'borrow' | 'liquidity' | 'redeem' | 'admin'
   const [showGuide, setShowGuide] = useState(false);
   const [theme, setTheme] = useTheme();
 
@@ -445,6 +446,14 @@ export default function App() {
     return <WelcomeScreen onSkip={() => setStage("app")} />;
   }
 
+  const navItems = [
+    { key: "home", label: "Home" },
+    { key: "borrow", label: "Borrow" },
+    { key: "liquidity", label: "Liquidity" },
+    { key: "redeem", label: "Redeem" },
+    ...(connected && isOwner ? [{ key: "admin", label: "Admin" }] : []),
+  ];
+
   return (
     <div className="app">
       <header className="topbar">
@@ -452,6 +461,17 @@ export default function App() {
           <span className="brand-badge">CHOG</span>
           <span className="brand-name">CHOG BANK</span>
         </div>
+        <nav className="topbar-nav">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              className={view === item.key ? "active" : ""}
+              onClick={() => setView(item.key)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
         <div className="topbar-right">
           <button
             className="btn small ghost theme-toggle"
@@ -496,26 +516,6 @@ export default function App() {
         </div>
       )}
 
-      {!connected && (
-        <section className="hero">
-          <div className="hero-image-wrap">
-            <span className="live-badge">
-              <span className="live-dot" /> LIVE ON TESTNET
-            </span>
-            <img src={chogBankHeroImage} alt="Chog Bank" className="hero-image" />
-          </div>
-          <h1>Borrow against your Chog. Never sell it.</h1>
-          <p>
-            Lock a Chog NFT as collateral and borrow up to 67% of its value in MON.
-            Can't pay it back? Flip a coin to walk away debt-free — lose, and you
-            still owe the full balance, but you'll pocket a CHOG consolation prize.
-          </p>
-          <button className="btn primary lg" onClick={connect}>
-            Connect Wallet to Start
-          </button>
-        </section>
-      )}
-
       {connected && wrongChain && (
         <div className="banner banner-warn">
           Wrong network — connected to chain {chainId}, this app runs on {chainMeta?.chainName} ({targetChainId}).
@@ -525,73 +525,107 @@ export default function App() {
         </div>
       )}
 
-      {connected && (
-        <main className="grid">
-          <section className="card stats">
-            <div className="stat">
-              <span className="stat-label">Pool TVL</span>
-              <span className="stat-value"><AnimatedNumber value={pool?.poolValue} digits={2} /> MON</span>
-            </div>
-            <div className="stat">
-              <span className="stat-label">Your Balance</span>
-              <span className="stat-value"><AnimatedNumber value={monBalance} digits={3} /> MON</span>
-            </div>
-            <div className="stat">
-              <span className="stat-label">Your CHOG</span>
-              <span className="stat-value"><AnimatedNumber value={chogBalance} digits={2} /> CHOG</span>
-            </div>
-          </section>
+      {view === "home" && (
+        <HomePage
+          connected={connected}
+          pool={pool}
+          monBalance={monBalance}
+          chogBalance={chogBalance}
+          onConnect={connect}
+          onShowGuide={() => setShowGuide(true)}
+          onGoToBorrow={() => setView("borrow")}
+          onGoToLiquidity={() => setView("liquidity")}
+        />
+      )}
 
-          <section className="card">
-            <div className="card-head">
-              <h2>My Chog NFTs</h2>
-              <button className="btn small" onClick={mintTestNft} disabled={busy}>
-                Mint test NFT
-              </button>
-            </div>
-            {myNfts.length === 0 && <p className="muted">No Chog NFTs yet — mint a test one above.</p>}
-            <div className="nft-grid">
-              {myNfts.map((n) => (
-                <NftCard
-                  key={n.tokenId}
-                  nft={n}
-                  allowedTerms={allowedTerms}
-                  termRates={termRates}
-                  onBorrow={borrow}
-                  busy={busy}
-                />
-              ))}
-            </div>
-          </section>
+      {view === "borrow" && (
+        <GatedPage connected={connected} onConnect={connect} title="Borrow" description="Mint a test Chog NFT and borrow MON against it.">
+          <div className="page-header">
+            <h1>Borrow</h1>
+            <p>Mint a test Chog NFT, see it auto-priced instantly, then borrow MON against it or settle an existing loan.</p>
+          </div>
+          <div className="grid">
+            <section className="card">
+              <div className="card-head">
+                <h2>My Chog NFTs</h2>
+                <button className="btn small" onClick={mintTestNft} disabled={busy}>
+                  Mint test NFT
+                </button>
+              </div>
+              {myNfts.length === 0 && <p className="muted">No Chog NFTs yet — mint a test one above.</p>}
+              <div className="nft-grid">
+                {myNfts.map((n) => (
+                  <NftCard
+                    key={n.tokenId}
+                    nft={n}
+                    allowedTerms={allowedTerms}
+                    termRates={termRates}
+                    onBorrow={borrow}
+                    busy={busy}
+                  />
+                ))}
+              </div>
+            </section>
 
-          <section className="card">
-            <h2>My Loans</h2>
-            {myLoans.length === 0 && <p className="muted">No active loans.</p>}
-            <div className="loan-list">
-              {myLoans.map((l) => (
-                <LoanCard key={l.tokenId} loan={l} onRepay={repay} onGamble={gamble} busy={busy} />
-              ))}
-            </div>
-          </section>
+            <section className="card">
+              <h2>My Loans</h2>
+              {myLoans.length === 0 && <p className="muted">No active loans.</p>}
+              <div className="loan-list">
+                {myLoans.map((l) => (
+                  <LoanCard key={l.tokenId} loan={l} onRepay={repay} onGamble={gamble} busy={busy} />
+                ))}
+              </div>
+            </section>
+          </div>
+        </GatedPage>
+      )}
 
-          <LiquidityPanel pool={pool} onDeposit={depositLiquidity} onWithdraw={withdrawLiquidity} busy={busy} />
+      {view === "liquidity" && (
+        <GatedPage connected={connected} onConnect={connect} title="Liquidity Pool" description="Deposit MON and become the house.">
+          <div className="page-header">
+            <h1>Liquidity Pool</h1>
+            <p>
+              Deposit MON and become the house — you earn a share of every loan's interest and every
+              gamble's house edge as the pool's share price rises. Withdraw anytime, up to available
+              liquidity.
+            </p>
+          </div>
+          <div className="grid">
+            <LiquidityPanel pool={pool} onDeposit={depositLiquidity} onWithdraw={withdrawLiquidity} busy={busy} />
+          </div>
+        </GatedPage>
+      )}
 
-          <ChogRedemptionPanel
-            chogEcon={chogEcon}
-            chogBalance={chogBalance}
-            onRedeem={redeemChog}
-            busy={busy}
-          />
+      {view === "redeem" && (
+        <GatedPage connected={connected} onConnect={connect} title="CHOG Redemption" description="Burn CHOG for a guaranteed MON payout.">
+          <div className="page-header">
+            <h1>CHOG Redemption</h1>
+            <p>
+              CHOG earned as a gamble consolation prize is backed by a reserve funded from house
+              profit — burn it here for a guaranteed MON payout.
+            </p>
+          </div>
+          <div className="grid">
+            <ChogRedemptionPanel chogEcon={chogEcon} chogBalance={chogBalance} onRedeem={redeemChog} busy={busy} />
+          </div>
+        </GatedPage>
+      )}
 
-          {isOwner && (
+      {view === "admin" && connected && isOwner && (
+        <>
+          <div className="page-header">
+            <h1>Admin</h1>
+            <p>Owner-only controls: price collateral and tune the protocol's risk and CHOG economics.</p>
+          </div>
+          <div className="grid">
             <AdminPanel
               onSetValuation={setValuation}
               onSetChogEconomics={setChogEconomics}
               chogEcon={chogEcon}
               busy={busy}
             />
-          )}
-        </main>
+          </div>
+        </>
       )}
 
       {gambleModal && (
@@ -602,6 +636,134 @@ export default function App() {
       )}
     </div>
   );
+}
+
+function HomePage({ connected, pool, monBalance, chogBalance, onConnect, onShowGuide, onGoToBorrow, onGoToLiquidity }) {
+  return (
+    <>
+      <section className="home-hero">
+        <div className="home-hero-text">
+          <span className="eyebrow">
+            <span className="live-dot" /> Monad Testnet — Chog Bank
+          </span>
+          <h1>
+            Borrow against your Chog.
+            <br />
+            <span className="accent-text">Never sell it.</span>
+          </h1>
+          <p>
+            Lock a Chog NFT as collateral and borrow up to 67% of its value in MON. Can't pay it
+            back? Flip a coin to walk away debt-free — lose, and you still owe the full balance,
+            but you'll pocket a CHOG consolation prize.
+          </p>
+          <div className="hero-ctas">
+            {connected ? (
+              <>
+                <button className="btn primary lg" onClick={onGoToBorrow}>
+                  Go to Borrow →
+                </button>
+                <button className="btn outline lg" onClick={onGoToLiquidity}>
+                  Liquidity Pool
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="btn primary lg" onClick={onConnect}>
+                  Connect Wallet
+                </button>
+                <button className="btn outline lg" onClick={onShowGuide}>
+                  Read the guide
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="home-hero-visual">
+          <img src={chogImage} alt="Chog" className="hero-mascot" />
+        </div>
+      </section>
+
+      <section className="how-it-works">
+        <div className="section-head">
+          <h2>How it works</h2>
+        </div>
+        <div className="steps-grid">
+          <div className="step-card">
+            <div className="step-number">1</div>
+            <h3>Mint &amp; price</h3>
+            <p>Mint a test Chog NFT — it's auto-priced instantly, no waiting on an admin.</p>
+          </div>
+          <div className="step-card">
+            <div className="step-number">2</div>
+            <h3>Borrow</h3>
+            <p>Pick a 7/14/30-day term and borrow up to 67% of its value in MON, paid out instantly.</p>
+          </div>
+          <div className="step-card">
+            <div className="step-number">3</div>
+            <h3>Repay or gamble</h3>
+            <p>Pay the loan back in full, or stake half the principal on a coin flip for full debt forgiveness.</p>
+          </div>
+          <div className="step-card">
+            <div className="step-number">4</div>
+            <h3>Earn as the house</h3>
+            <p>Deposit MON into the Liquidity Pool to earn a share of every loan's interest and every gamble played.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="featured-section">
+        <div className="section-head">
+          <h2>Live on testnet</h2>
+        </div>
+        <div className="featured-card">
+          <img src={chogBankHeroImage} alt="Chog Bank" className="featured-image" />
+          <div className="featured-body">
+            <span className="featured-eyebrow">Featured</span>
+            <h3>Chog Bank Vault</h3>
+            <p>
+              The pool funding every loan on Chog Bank — anyone can deposit and earn a share of
+              interest and the house edge.
+            </p>
+            {connected ? (
+              <div className="featured-stats">
+                <div className="stat">
+                  <span className="stat-label">Pool TVL</span>
+                  <span className="stat-value"><AnimatedNumber value={pool?.poolValue} digits={2} /> MON</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-label">Your Balance</span>
+                  <span className="stat-value"><AnimatedNumber value={monBalance} digits={3} /> MON</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-label">Your CHOG</span>
+                  <span className="stat-value"><AnimatedNumber value={chogBalance} digits={2} /> CHOG</span>
+                </div>
+              </div>
+            ) : (
+              <div className="featured-stats">
+                <p className="muted small">Connect your wallet to see live pool stats.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function GatedPage({ connected, onConnect, title, description, children }) {
+  if (!connected) {
+    return (
+      <div className="page-header">
+        <h1>{title}</h1>
+        <p>{description}</p>
+        <button className="btn primary gated-connect" onClick={onConnect}>
+          Connect Wallet
+        </button>
+      </div>
+    );
+  }
+  return children;
 }
 
 function NftCard({ nft, allowedTerms, termRates, onBorrow, busy }) {
@@ -708,11 +870,7 @@ function LiquidityPanel({ pool, onDeposit, onWithdraw, busy }) {
 
   return (
     <section className="card">
-      <h2>Liquidity Pool</h2>
-      <p className="muted small">
-        Deposit MON and become the house — you earn a share of every loan's interest and every
-        gamble's house edge as the pool's share price rises.
-      </p>
+      <h2>Your Position</h2>
       {pool && (
         <>
           <div className="row">
@@ -752,11 +910,7 @@ function ChogRedemptionPanel({ chogEcon, chogBalance, onRedeem, busy }) {
 
   return (
     <section className="card">
-      <h2>CHOG Redemption</h2>
-      <p className="muted small">
-        CHOG earned as a gamble consolation prize is backed by a reserve funded from house profit —
-        burn it here for a guaranteed MON payout.
-      </p>
+      <h2>Your CHOG</h2>
       {chogEcon && (
         <>
           <div className="row">
@@ -802,7 +956,7 @@ function AdminPanel({ onSetValuation, onSetChogEconomics, chogEcon, busy }) {
 
   return (
     <section className="card admin">
-      <h2>Admin</h2>
+      <h2>Controls</h2>
       <div className="admin-row">
         <label>Set NFT valuation</label>
         <input type="number" value={valTokenId} onChange={(e) => setValTokenId(e.target.value)} placeholder="tokenId" />
