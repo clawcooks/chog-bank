@@ -776,6 +776,7 @@ function NftCard({ nft, allowedTerms, termRates, onBorrow, busy }) {
 
   return (
     <div className="nft-card">
+      <img src={chogImage} alt="" className="nft-thumb" />
       <div className="nft-id">Chog #{nft.tokenId}</div>
       {!hasValuation && <div className="muted small">Not valued yet — ask the admin to set a valuation.</div>}
       {hasValuation && (

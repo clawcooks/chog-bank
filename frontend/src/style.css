@@ -667,6 +667,15 @@ h1, h2, h3 {
   box-shadow: var(--shadow-card-hover);
 }
 
+.nft-thumb {
+  display: block;
+  width: calc(100% + 28px);
+  margin: -14px -14px 12px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 14px 14px 0 0;
+}
+
 .nft-id { font-family: var(--font-display); font-weight: 800; font-size: 18px; margin-bottom: 8px; color: var(--ink); }
 
 .row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); padding: 3px 0; }
