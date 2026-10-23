@@ -1051,13 +1051,22 @@ function GuideContent() {
   return (
     <div className="guide-content">
       <h2>What is Chog Bank?</h2>
-      <p>
-        Chog Bank lets you borrow MON against your Chog NFT instead of selling it. Can't repay?
-        Flip a coin — win and your debt is forgiven outright, lose and you still owe the full
-        balance, but you walk away with a CHOG consolation bonus. Anyone can become the house too
-        — deposit MON into the pool and earn a cut of every loan's interest and every gamble's
-        house edge.
+      <p className="lede">
+        Chog Bank lets you borrow MON against your <span className="highlight">Chog NFT</span>{" "}
+        instead of selling it. Can't repay? <span className="highlight">Flip a coin</span> — win
+        and your debt is forgiven outright, lose and you still owe the full balance, but you walk
+        away with a <span className="highlight">CHOG consolation bonus</span>. Anyone can become
+        the house too — deposit MON into the pool and earn a cut of every loan's interest and
+        every gamble's house edge.
       </p>
+
+      <div className="fact-chips">
+        <span className="fact-chip">Up to 67% LTV</span>
+        <span className="fact-chip">7 / 14 / 30-day terms</span>
+        <span className="fact-chip">Instant self-serve pricing</span>
+        <span className="fact-chip">Anyone can be the house</span>
+      </div>
+
       <h3>How to try it</h3>
       <ol className="guide-steps">
         <li>Connect a wallet on Monad Testnet (chain 10143) — MetaMask will prompt to add/switch it.</li>
@@ -1067,11 +1076,12 @@ function GuideContent() {
         <li>Lost the gamble? Redeem your CHOG bonus for MON, backed by a real protocol reserve.</li>
         <li>Deposit MON into the Liquidity Pool to become the house yourself and earn from every loan and gamble.</li>
       </ol>
-      <p className="muted small">
-        Heads up: this is a hackathon build on Monad testnet. The coin flip uses on-chain
-        pseudo-randomness — fine for a demo, not for real funds — and the Chog NFT collection here
-        is a free-mint stand-in (capped at 1969) for the real one.
-      </p>
+
+      <div className="note-box">
+        <strong>Heads up:</strong> this is a hackathon build on Monad testnet. The coin flip uses
+        on-chain pseudo-randomness — fine for a demo, not for real funds — and the Chog NFT
+        collection here is a free-mint stand-in (capped at 1969) for the real one.
+      </div>
     </div>
   );
 }

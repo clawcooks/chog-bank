@@ -219,15 +219,29 @@ h1, h2, h3 {
   color: var(--ink);
 }
 
-.theme-toggle {
+.theme-toggle,
+.nav-toggle {
   width: 36px;
   height: 36px;
   padding: 0;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 15px;
   line-height: 1;
+}
+.theme-toggle { display: inline-flex; }
+
+.btn.theme-toggle:hover:not(:disabled),
+.btn.nav-toggle:hover:not(:disabled) {
+  transform: scale(1.14);
+  background: var(--purple-soft);
+  border-color: var(--purple);
+  color: var(--purple-2);
+  box-shadow: 0 6px 18px rgba(124, 92, 250, 0.3);
+}
+.btn.theme-toggle:active:not(:disabled),
+.btn.nav-toggle:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 .brand-name {
@@ -552,6 +566,39 @@ h1, h2, h3 {
   margin: 0 0 8px;
 }
 
+.guide-content .lede {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text);
+  padding-left: 16px;
+  border-left: 3px solid var(--purple-soft);
+  margin-bottom: 18px;
+}
+.highlight {
+  color: var(--purple-2);
+  font-weight: 600;
+}
+
+.fact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.fact-chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--purple-2);
+  background: var(--purple-soft);
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.15s ease;
+}
+.fact-chip:hover { transform: translateY(-2px) scale(1.04); border-color: var(--purple); }
+
 .guide-steps {
   margin: 0;
   padding: 0;
@@ -559,7 +606,17 @@ h1, h2, h3 {
   counter-reset: step;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
+  position: relative;
+}
+.guide-steps::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: var(--border);
 }
 .guide-steps li {
   counter-increment: step;
@@ -585,7 +642,26 @@ h1, h2, h3 {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
 }
+.guide-steps li:hover::before {
+  transform: scale(1.18);
+  box-shadow: 0 4px 14px rgba(124, 92, 250, 0.4);
+}
+
+.note-box {
+  background: var(--amber-bg);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  border-left: 3px solid var(--amber);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-top: 20px;
+}
+.note-box strong { color: var(--amber); }
 
 .modal.guide-modal {
   max-width: 560px;
