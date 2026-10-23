@@ -124,6 +124,7 @@ export default function App() {
   const [stage, setStage] = useState(() => (hasSeenIntro() ? "app" : "intro")); // 'intro' | 'welcome' | 'app'
   const [view, setView] = useState("home"); // 'home' | 'borrow' | 'liquidity' | 'redeem' | 'admin'
   const [showGuide, setShowGuide] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const [theme, setTheme] = useTheme();
 
   const [account, setAccount] = useState(null);
@@ -496,8 +497,61 @@ export default function App() {
               <span>{short(account)}</span>
             </div>
           )}
+          <button
+            className="btn small ghost nav-toggle"
+            onClick={() => setNavOpen((v) => !v)}
+            aria-label={navOpen ? "Close menu" : "Open menu"}
+            aria-expanded={navOpen}
+          >
+            {navOpen ? "✕" : "☰"}
+          </button>
         </div>
       </header>
+
+      {navOpen && (
+        <div className="mobile-menu">
+          {navItems.map((item) => (
+            <button
+              key={item.key}
+              className={view === item.key ? "active" : ""}
+              onClick={() => {
+                setView(item.key);
+                setNavOpen(false);
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
+          <div className="mobile-menu-divider" />
+          <button
+            onClick={() => {
+              setShowGuide(true);
+              setNavOpen(false);
+            }}
+          >
+            Guide
+          </button>
+          <button
+            onClick={() => {
+              setTheme(theme === "dark" ? "light" : "dark");
+              setNavOpen(false);
+            }}
+          >
+            {theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          </button>
+          {!connected && (
+            <button
+              className="active"
+              onClick={() => {
+                connect();
+                setNavOpen(false);
+              }}
+            >
+              Connect Wallet
+            </button>
+          )}
+        </div>
+      )}
 
       {showGuide && (
         <div className="modal-overlay" onClick={() => setShowGuide(false)}>
@@ -741,7 +795,21 @@ function HomePage({ connected, pool, monBalance, chogBalance, onConnect, onShowG
               </div>
             ) : (
               <div className="featured-stats">
-                <p className="muted small">Connect your wallet to see live pool stats.</p>
+                <div className="stat stat-locked">
+                  <span className="stat-label">Pool TVL</span>
+                  <span className="stat-value">••••</span>
+                </div>
+                <div className="stat stat-locked">
+                  <span className="stat-label">Your Balance</span>
+                  <span className="stat-value">••••</span>
+                </div>
+                <div className="stat stat-locked">
+                  <span className="stat-label">Your CHOG</span>
+                  <span className="stat-value">••••</span>
+                </div>
+                <button className="btn primary small stat-unlock" onClick={onConnect}>
+                  Connect to unlock
+                </button>
               </div>
             )}
           </div>

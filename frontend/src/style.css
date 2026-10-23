@@ -171,9 +171,46 @@ h1, h2, h3 {
 .topbar-nav button:hover { color: var(--ink); background: var(--bg-soft); }
 .topbar-nav button.active { color: var(--ink); background: var(--purple-soft); }
 
+.nav-toggle {
+  display: none;
+  font-size: 16px;
+}
+
 @media (max-width: 760px) {
-  .topbar { flex-wrap: wrap; row-gap: 10px; }
-  .topbar-nav { order: 3; width: 100%; justify-content: flex-start; }
+  .topbar-nav { display: none; }
+  .theme-toggle, .topbar-right .btn.ghost:not(.nav-toggle) { display: none; }
+  .nav-toggle { display: inline-flex; }
+}
+
+.mobile-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 0 20px;
+  margin-top: -8px;
+  animation: fadein 0.15s ease;
+}
+.mobile-menu button {
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--muted);
+  padding: 12px 6px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.mobile-menu button:hover { background: var(--bg-soft); color: var(--ink); }
+.mobile-menu button.active { color: var(--purple-2); background: var(--purple-soft); }
+.mobile-menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+@media (min-width: 761px) {
+  .mobile-menu { display: none; }
 }
 
 .btn.ghost {
@@ -331,6 +368,10 @@ h1, h2, h3 {
   box-shadow: 0 0 80px rgba(124, 92, 250, 0.35);
   border: 6px solid var(--purple-soft);
 }
+@media (max-width: 760px) {
+  .hero-mascot { max-width: 160px; box-shadow: 0 0 40px rgba(124, 92, 250, 0.3); border-width: 4px; }
+  .home-hero { gap: 20px; }
+}
 
 .btn.outline {
   background: transparent;
@@ -421,11 +462,17 @@ h1, h2, h3 {
 .featured-body p { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 0 20px; }
 .featured-stats {
   display: flex;
+  align-items: center;
   gap: 32px;
   flex-wrap: wrap;
   margin-top: auto;
   padding-top: 16px;
   border-top: 1px solid var(--border);
+}
+.stat-locked .stat-value { color: var(--border); letter-spacing: 2px; }
+.stat-unlock { margin-left: auto; }
+@media (max-width: 500px) {
+  .stat-unlock { margin-left: 0; width: 100%; }
 }
 
 /* ---------- shared page header (Borrow / Liquidity / Redeem / Admin) ---------- */
